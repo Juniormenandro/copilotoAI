@@ -1,0 +1,65 @@
+# Core
+flask
+requests
+python-dotenv
+pymongo
+streamlit pymongo pandas
+openai-agents    
+matplotlib
+wordcloud‑1.9.3‑cp311‑cp311‑win_amd64.whl
+wordcloud --upgrade --force-reinstall --no-cache-dir
+
+
+
+
+
+# Agendamentos e jobs
+apscheduler
+
+# Auxiliares
+tqdm
+httpx
+typing-extensions
+
+
+
+# comando para instalar
+# pip install -r requirements.txt
+
+
+# pip install --upgrade --force-reinstall openai-agents
+
+#----------------------------------------------------------------------
+
+# python -m venv venv
+# Ativar o ambiente virtual
+# .\venv\Scripts\activate
+
+
+# deactivate
+# --------------------------------------------------------
+
+
+# # Dentro da pasta do projeto
+# python -m venv venv
+# source venv/bin/activate  # Linux/Mac
+# # ou
+# .\venv\Scripts\activate   # Windows
+
+# pip install --upgrade pip
+# pip install -r requirements.txt
+
+
+
+
+
+
+
+
+
+
+# python -m venv .venv
+# .venv\Scripts\activate 
+# python.exe -m pip install --upgrade pip
+# pip install openai-agents   
+# pip install requests  
