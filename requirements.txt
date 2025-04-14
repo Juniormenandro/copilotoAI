@@ -3,15 +3,8 @@ flask
 requests
 python-dotenv
 pymongo
-streamlit pymongo pandas
-openai-agents    
+openai-agents==0.0.9
 matplotlib
-wordcloud‑1.9.3‑cp311‑cp311‑win_amd64.whl
-wordcloud --upgrade --force-reinstall --no-cache-dir
-
-
-
-
 
 # Agendamentos e jobs
 apscheduler
@@ -20,46 +13,47 @@ apscheduler
 tqdm
 httpx
 typing-extensions
+streamlit
+pandas
 
+#----------------------------------------------------------------------
+# Ativar o ambiente virtual
 
+# python -m venv venv
+# .\venv\Scripts\activate
+# 
 
-# comando para instalar
+# --------------------------------------------------------
+
+# python.exe -m pip install --upgrade pip
+# pip install --upgrade pip
 # pip install -r requirements.txt
+# pip install streamlit pymongo pandas
+
 
 
 # pip install --upgrade --force-reinstall openai-agents
+# pip install wordcloud‑1.9.3‑cp311‑cp311‑win_amd64.whl
+# pip install wordcloud --upgrade --force-reinstall --no-cache-dir
 
-#----------------------------------------------------------------------
-
-# python -m venv venv
-# Ativar o ambiente virtual
-# .\venv\Scripts\activate
-
-
-# deactivate
-# --------------------------------------------------------
+# brew install --cask ngrok   no mac
+# choco install ngrok
+# ./ngrok http 500
+# ./ngrok config add-authtoken 2tfWBwF05kG3bSzxVD2JyizdDkY_2fsHFYSxPABgGQ53ezSMa
 
 
-# # Dentro da pasta do projeto
-# python -m venv venv
-# source venv/bin/activate  # Linux/Mac
-# # ou
-# .\venv\Scripts\activate   # Windows
 
+
+# ==============================================
+#   iniciacao no mac
+
+  
 # pip install --upgrade pip
 # pip install -r requirements.txt
+# pip install openai-agents --upgrade --force-reinstall
+# brew install --cask ngrok
+# ngrok config add-authtoken 2tfWBwF05kG3bSzxVD2JyizdDkY_2fsHFYSxPABgGQ53ezSMa
+# ngrok http 5000
 
 
-
-
-
-
-
-
-
-
-# python -m venv .venv
-# .venv\Scripts\activate 
-# python.exe -m pip install --upgrade pip
-# pip install openai-agents   
-# pip install requests  
+# find . | grep __pycache__ | xargs rm -r

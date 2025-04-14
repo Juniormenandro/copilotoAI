@@ -23,7 +23,7 @@ def registrar_mensagem(wa_id, origem, conteudo, timestamp=None):
         "conteudo": conteudo,
         "timestamp": timestamp or int(datetime.utcnow().timestamp())
     })
-
-def consultar_historico(wa_id, limite=50):
+    print("💾 Mensagem atualizada:")
+def consultar_historico(wa_id, limite=20):
     mensagens = historico_collection.find({"wa_id": wa_id}).sort("timestamp", -1).limit(limite)
     return list(mensagens)[::-1]  # ordem cronológica normal

@@ -3,15 +3,9 @@ from copiloto_context import CopilotoContext
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
+from agents import Runner
 import logging
-from copiloto_agents import (
-    triage_agent,
-    tarefa_agent,
-    memoria_agent,
-    emocional_agent,
-    comportamento_agent
-)
-
+from comportamento_agent import comportamento_agent
 # Configuração do logging
 logger = logging.getLogger(__name__)
 
@@ -24,6 +18,9 @@ if not mongo_uri:
     raise EnvironmentError("MONGO_URI não configurado no .env")
 client = MongoClient(mongo_uri)
 db = client.copilotoAI
+
+
+
 
 async def montar_contexto_usuario(contexto_base: CopilotoContext, mensagem_atual: str = "") -> CopilotoContext:
     try:
@@ -110,53 +107,13 @@ async def processar_mensagem_usuario(mensagem: str, wa_id: str) -> Dict:
 
         contexto = await montar_contexto_usuario(contexto_base, mensagem)
         input_context = montar_input_context(contexto)
-
-        triage_result = await triage_agent.process(mensagem, input_context)
+        print(f"dentro do processo antes do run_agent, {input_context}")
+        
+        triage_result = await Runner.run(comportamento_agent, input=mensagem, context=input_context)
         logger.info(f"Resultado do triage: {triage_result}")
-
-        agentes = {
-            "Organizador de Tarefas": tarefa_agent,
-            "Memória Viva": memoria_agent,
-            "Suporte Emocional": emocional_agent,
-            "Analisador de Comportamento": comportamento_agent
-        }
-
-        resultados = []
-
-        if isinstance(triage_result, dict):
-            triage_result = triage_result.get("result", "transfer_to_Analisador de Comportamento")
-
-        if isinstance(triage_result, str):
-            if "\n" in triage_result:
-                for linha in triage_result.strip().split("\n"):
-                    if ":" in linha:
-                        transfer, parte_mensagem = linha.split(":", 1)
-                        agente_nome = transfer.replace("transfer_to_", "").strip()
-                        parte_mensagem = parte_mensagem.strip()
-                        if agente_nome in agentes:
-                            agente = agentes[agente_nome]
-                            resultado = await agente.process(parte_mensagem, input_context)
-                            resultados.append({"agente": agente_nome, "resultado": resultado})
-                        else:
-                            logger.warning(f"Agente '{agente_nome}' não encontrado para mensagem: {parte_mensagem}")
-                            resultado = await comportamento_agent.process(parte_mensagem, input_context)
-                            resultados.append({"agente": "Analisador de Comportamento", "resultado": resultado})
-            elif triage_result.startswith("transfer_to_"):
-                agente_nome = triage_result.replace("transfer_to_", "").strip()
-                if agente_nome in agentes:
-                    agente = agentes[agente_nome]
-                    resultado = await agente.process(mensagem, input_context)
-                    resultados.append({"agente": agente_nome, "resultado": resultado})
-                else:
-                    logger.warning(f"Agente '{agente_nome}' não encontrado")
-                    resultado = await comportamento_agent.process(mensagem, input_context)
-                    resultados.append({"agente": "Analisador de Comportamento", "resultado": resultado})
-            elif triage_result.startswith("Nenhum:"):
-                resultado = await comportamento_agent.process(mensagem, input_context)
-                resultados.append({"agente": "Analisador de Comportamento", "resultado": resultado})
-
-        return {"status": "success", "resultados": resultados}
-
+        print(f"Resultado do triage: {triage_result}")
+        
+        return {"status": "success", "resultados": triage_result}
     except Exception as e:
         logger.error(f"Erro ao processar mensagem: {str(e)}")
         return {"status": "error", "message": str(e)}
