@@ -22,6 +22,7 @@ def to_function_tool(fn, name: str, description: str, params_schema: dict):
 
         # 🧪 Depuração do contexto
         print(f"🧪 Tipo de context recebido: {type(context)}")
+        print(f"🧪 Tipo de context recebido: {context}")
         wa_id_from_context = getattr(context, "context", {}).get("wa_id")
         # 🔁 Sempre sobrescreve o wa_id com o correto vindo do contexto
         if "wa_id" in inspect.signature(fn).parameters:
@@ -140,6 +141,28 @@ detectar_mudanca = to_function_tool(
 )
 
 
+placeholder_comportamental = to_function_tool(
+    fn=lambda mensagem: {"message": "Placeholder de análise comportamental."},
+    name="placeholder_comportamental",
+    description="Simula uma análise de comportamento para manter o agente funcional.",
+    params_schema={
+        "type": "object",
+        "properties": {
+            "mensagem": {"type": "string"},
+        },
+        "required": ["mensagem"],
+        "additionalProperties": False
+    }
+)
+
+
+
+
+
+
+
+
+
 # Agents
 organizador_memoria_agent = Agent(
     name="organizador_memoria_agent",
@@ -198,21 +221,6 @@ organizador_memoria_agent = Agent(
 )
 
 
-# Placeholder tool do analisador de comportamento
-placeholder_comportamental = FunctionTool(
-    name="placeholder_comportamental",
-    description="Simula uma análise de comportamento para manter o agente funcional.",
-    params_json_schema={
-        "type": "object",
-        "properties": {
-            "mensagem": {"type": "string"},
-        },
-        "required": ["mensagem"],
-        "additionalProperties": False
-    },
-    on_invoke_tool=lambda context, tool_input: {"message": "Placeholder de análise comportamental."}
-)
-
 emocional_comportamental_agent = Agent(
     name="emocional_comportamental_agent",
     instructions=f"""{RECOMMENDED_PROMPT_PREFIX}
@@ -243,8 +251,8 @@ emocional_comportamental_agent = Agent(
     **"Eu sou o agente emocional e comportamental."**
     """,
     tools=[
-        suporte_emocional_tool,
-        detectar_mudanca_de_intencao_tool,
+        suporte_emocional,
+        detectar_mudanca,
         placeholder_comportamental
     ]
 )
@@ -297,8 +305,8 @@ triage_agent = Agent(
 #         resultado = await Runner.run(triage_agent, input=mensagem)
 #         print("🎯 Resultado:", resultado.output if hasattr(resultado, "output") else resultado)
 
-if __name__ == "__main__":
-    asyncio.run(testar_todas())
+# if __name__ == "__main__":
+#     asyncio.run(testar_todas())
 
 
 

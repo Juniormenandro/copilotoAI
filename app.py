@@ -76,7 +76,7 @@ def webhook():
                 "comportamento": comportamento,
                 "historico" : historico
             }
-            print("🎯 Resultado bruto:", contexto)
+            #print("🎯 Resultado bruto:", contexto)
             resposta = asyncio.run(
                 Runner.run(
                     triage_agent,
@@ -85,11 +85,21 @@ def webhook():
                 )
             )
 
-            resposta_texto = resposta.output if hasattr(resposta, "output") else str(resposta)
-            #print("🎯 Resultado bruto:", resposta_texto)
+            # 🔍 Tenta extrair a resposta final do agente
+            resposta_texto = getattr(resposta, "final_output", None)
+            if not resposta_texto:
+                print("⚠️ .final_output ausente ou vazio. Usando fallback para str(resposta)")
+                resposta_texto = str(resposta)
+            else:
+                print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
 
             salvar_mensagem(wa_id, "copiloto", resposta_texto)
             enviar_resposta(wa_id, resposta_texto)
+
+            print("🎯 Resultado final enviado:", resposta_texto)
+
+
+
 
         except Exception as e:
             print("❌ Erro ao processar a mensagem:", e)

@@ -6,6 +6,7 @@ import os
 from agents import Runner
 import logging
 from comportamento_agent import comportamento_agent
+
 # Configuração do logging
 logger = logging.getLogger(__name__)
 
@@ -19,12 +20,15 @@ if not mongo_uri:
 client = MongoClient(mongo_uri)
 db = client.copilotoAI
 
+def consultar_historico_com_agente(wa_id, agente_nome, limite=10):
+    mensagens = db.historico.find({
+        "wa_id": wa_id,
+        "origem": {"$in": ["usuario", agente_nome]}
+    }).sort("timestamp", -1).limit(limite)
+    return list(mensagens)[::-1]
 
-
-
-async def montar_contexto_usuario(contexto_base: CopilotoContext, mensagem_atual: str = "") -> CopilotoContext:
+async def montar_contexto_usuario(contexto_base: CopilotoContext, mensagem_atual: str = "", agente_destino: str = None) -> CopilotoContext:
     try:
-        colecao_mensagens = db["historico"]
         colecao_users = db["users"]
         colecao_objetivos = db["memorias"]
         colecao_comportamento = db["comportamento"]
@@ -34,30 +38,29 @@ async def montar_contexto_usuario(contexto_base: CopilotoContext, mensagem_atual
             logger.error("wa_id não fornecido")
             raise ValueError("wa_id é obrigatório")
 
-        wa_id_formatted = f"wa_id:{wa_id}"
-
-        user = colecao_users.find_one({"wa_id": wa_id_formatted})
+        user = colecao_users.find_one({"wa_id": wa_id})
         nome = user.get("nome", contexto_base.nome) if user else contexto_base.nome
 
-        objetivo = colecao_objetivos.find_one({"wa_id": wa_id_formatted}, sort=[("timestamp", -1)])
+        objetivo = colecao_objetivos.find_one({"wa_id": wa_id}, sort=[("timestamp", -1)])
         objetivo_dict = {"descricao": objetivo["descricao"]} if objetivo and objetivo.get("descricao") else None
         objetivo_da_semana = objetivo.get("descricao", contexto_base.objetivo_da_semana) if objetivo else contexto_base.objetivo_da_semana
 
-        comportamento = colecao_comportamento.find_one({"wa_id": wa_id_formatted}, sort=[("timestamp", -1)])
+        comportamento = colecao_comportamento.find_one({"wa_id": wa_id}, sort=[("timestamp", -1)])
         estilo_produtivo = comportamento.get("estilo_produtivo", contexto_base.estilo_produtivo) if comportamento else contexto_base.estilo_produtivo
         emocional = comportamento.get("emocao", contexto_base.emocional) if comportamento else contexto_base.emocional
         comportamento_dict = comportamento if comportamento else None
 
-        historico_cursor = colecao_mensagens.find({"wa_id": wa_id_formatted}).sort("timestamp", -1).limit(10)
-        historico = [
-            {
-                "mensagem": msg.get("mensagem", msg.get("conteudo", "")),
-                "tipo": msg.get("origem", "desconhecido")
-            }
-            for msg in historico_cursor if msg.get("mensagem") or msg.get("conteudo")
-        ][::-1]
+        if agente_destino:
+            historico = consultar_historico_com_agente(wa_id, agente_destino)
+        else:
+            historico = []
 
-        contexto_atualizado = CopilotoContext(
+        historico_formatado = [
+            {"mensagem": msg.get("mensagem", msg.get("conteudo", "")), "tipo": msg.get("origem", "desconhecido")}
+            for msg in historico
+        ] + ([{"mensagem": mensagem_atual, "tipo": "usuário"}] if mensagem_atual else [])
+
+        return CopilotoContext(
             wa_id=wa_id,
             nome=nome or "Usuário",
             objetivo_da_semana=objetivo_da_semana,
@@ -65,11 +68,8 @@ async def montar_contexto_usuario(contexto_base: CopilotoContext, mensagem_atual
             emocional=emocional,
             comportamento=comportamento_dict,
             objetivo=objetivo_dict,
-            historico=historico + ([{"mensagem": mensagem_atual, "tipo": "usuário"}] if mensagem_atual else [])
+            historico=historico_formatado
         )
-
-        logger.info(f"Contexto montado com sucesso para wa_id: {wa_id}")
-        return contexto_atualizado
 
     except Exception as e:
         logger.error(f"Erro ao montar contexto: {str(e)}")
@@ -91,8 +91,7 @@ def montar_input_context(contexto: CopilotoContext) -> dict:
         logger.error(f"Erro ao montar input context: {str(e)}")
         return {}
 
-# Função principal de processamento
-async def processar_mensagem_usuario(mensagem: str, wa_id: str) -> Dict:
+async def processar_mensagem_usuario(mensagem: str, wa_id: str, agente_destino: str = "emocional_comportamental_agent") -> Dict:
     try:
         contexto_base = CopilotoContext(
             wa_id=wa_id,
@@ -105,15 +104,13 @@ async def processar_mensagem_usuario(mensagem: str, wa_id: str) -> Dict:
             historico=[]
         )
 
-        contexto = await montar_contexto_usuario(contexto_base, mensagem)
+        contexto = await montar_contexto_usuario(contexto_base, mensagem, agente_destino)
         input_context = montar_input_context(contexto)
-        print(f"dentro do processo antes do run_agent, {input_context}")
-        
         triage_result = await Runner.run(comportamento_agent, input=mensagem, context=input_context)
         logger.info(f"Resultado do triage: {triage_result}")
         print(f"Resultado do triage: {triage_result}")
-        
         return {"status": "success", "resultados": triage_result}
+
     except Exception as e:
         logger.error(f"Erro ao processar mensagem: {str(e)}")
         return {"status": "error", "message": str(e)}
