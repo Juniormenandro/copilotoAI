@@ -66,9 +66,7 @@ def webhook():
             print(f"📥 Mensagem recebida: '{user_message}' de {nome} ({wa_id})")
         
         try:
-            print("🚀 Executando Runner com o triage_agent...")
             print("🧠 Agente:", triage_agent.name)
-            print("🛠️ Tools:", asyncio.run(triage_agent.get_all_tools()))
             comportamento = consultar_comportamento(wa_id)
             historico = consultar_historico(wa_id)
             contexto = {
@@ -95,12 +93,6 @@ def webhook():
 
             salvar_mensagem(wa_id, "copiloto", resposta_texto)
             enviar_resposta(wa_id, resposta_texto)
-
-            print("🎯 Resultado final enviado:", resposta_texto)
-
-
-
-
         except Exception as e:
             print("❌ Erro ao processar a mensagem:", e)
     return Response(status=200)
