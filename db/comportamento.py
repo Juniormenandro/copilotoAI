@@ -1,4 +1,5 @@
 from db.mongo import db
+from datetime import datetime
 
 comportamento_collection = db["comportamento"]
 
@@ -13,7 +14,8 @@ def criar_comportamento_padrao(wa_id):
             "não gosta de cobrança dura"
         ],
         "estilo": "curto e motivacional",
-        "foco": "clareza mental com leveza emocional"
+        "foco": "clareza mental com leveza emocional",
+        "timestamp": datetime.utcnow()
     }
 
     existente = comportamento_collection.find_one({"wa_id": wa_id})
@@ -21,28 +23,27 @@ def criar_comportamento_padrao(wa_id):
         comportamento_collection.insert_one(comportamento)
         print(f"🧠 Perfil comportamental padrão salvo para {wa_id}")
 
-
 def salvar_comportamento(wa_id, novos_dados):
-    existente = comportamento_collection.find_one({"wa_id": wa_id})
+    existentes = comportamento_collection.find_one({"wa_id": wa_id})
 
-    if not existente:
-        # Se ainda não existir, insere o padrão
+    if not existentes:
         comportamento = {
             "wa_id": wa_id,
-            **novos_dados
+            **novos_dados,
+            "timestamp": datetime.utcnow()
         }
         comportamento_collection.insert_one(comportamento)
         print(f"🧠 Comportamento criado para {wa_id}")
         return
 
-    # Descobre o que realmente mudou
     atualizacoes = {}
     for campo, novo_valor in novos_dados.items():
-        valor_atual = existente.get(campo)
+        valor_atual = existentes.get(campo)
         if valor_atual != novo_valor:
             atualizacoes[campo] = novo_valor
 
     if atualizacoes:
+        atualizacoes["timestamp"] = datetime.utcnow()
         comportamento_collection.update_one(
             {"wa_id": wa_id},
             {"$set": atualizacoes}
@@ -50,8 +51,6 @@ def salvar_comportamento(wa_id, novos_dados):
         print(f"🧠 Campos atualizados para {wa_id}: {list(atualizacoes.keys())}")
     else:
         print(f"✅ Nenhuma mudança detectada para {wa_id}, nada foi alterado.")
-
-
 
 def consultar_comportamento(wa_id):
     return comportamento_collection.find_one({"wa_id": wa_id})

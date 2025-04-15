@@ -1,46 +1,57 @@
-# Core
-flask
-requests
-python-dotenv
-pymongo
-openai-agents==0.0.9
-matplotlib
+# requirements.txt - dependências do projeto Copiloto IA
 
-# Agendamentos e jobs
-apscheduler
+# OpenAI SDK para transcrição com Whisper
+openai>=1.10.0
 
-# Auxiliares
-tqdm
-httpx
-typing-extensions
-streamlit
-pandas
+# Transcrição e tradução
+deep-translator>=1.11.4
+langdetect>=1.0.9
 
-#----------------------------------------------------------------------
-# Ativar o ambiente virtual
+# Manipulação de áudio
+ffmpeg-python>=0.2.0
 
+# API Flask
+Flask>=2.2.5
+requests>=2.31.0
+
+# Banco de dados
+pymongo>=4.6.1
+
+# Assíncrono
+aiohttp>=3.9.3
+
+# Webhook seguro via tunelamento (Ngrok CLI)
+pyngrok>=5.3.0
+
+# Interface para análise com painel
+streamlit>=1.32.2
+
+# -----------------------------
+# COMO INSTALAR DEPENDÊNCIAS
+# -----------------------------
+# Para Windows/macOS/Linux:
+# Crie um ambiente virtual e ative:
 # python -m venv venv
-# .\venv\Scripts\activate
-# 
+# source venv/bin/activate  (Linux/Mac)
+# venv\Scripts\activate     (Windows)
 
-# --------------------------------------------------------
-
-# python.exe -m pip install --upgrade pip
-# pip install --upgrade pip
+# Instale as dependências:
 # pip install -r requirements.txt
-# pip install streamlit pymongo pandas
 
+# -----------------------------
+# COMANDOS PARA INICIAR O PROJETO
+# -----------------------------
 
+# 1. Inicie o Flask (processamento de mensagens via WhatsApp):
+# python app.py
 
-# pip install --upgrade --force-reinstall openai-agents
-# pip install wordcloud‑1.9.3‑cp311‑cp311‑win_amd64.whl
-# pip install wordcloud --upgrade --force-reinstall --no-cache-dir
+# 2. Em outro terminal, rode o painel Streamlit:
+# streamlit run painel.py
 
-# brew install --cask ngrok   no mac
-# choco install ngrok
-# ./ngrok http 500
-# ./ngrok config add-authtoken 2tfWBwF05kG3bSzxVD2JyizdDkY_2fsHFYSxPABgGQ53ezSMa
+# 3. Em outro terminal, inicie o Ngrok para expor o webhook:
+# ngrok http 5000
 
+# (Copie a URL gerada pelo Ngrok e cadastre como webhook no Meta Business)
 
 
 
@@ -50,10 +61,23 @@ pandas
   
 # pip install --upgrade pip
 # pip install -r requirements.txt
+# brew install ffmpeg
+# pip install openai pydub requests
+# pip install googletrans==4.0.0-rc1
+# pip install --upgrade httpx
+
+# pip install "httpx>=0.23.0" "httpcore>=1.0.0"
+# brew install ffmpeg
+# pip install langdetect
+
+
+# openai>=1.0.0
+# googletrans==4.0.0-rc1
+# ffmpeg-python  # opcional, usamos subprocess direto aqui
+
+
 # pip install openai-agents --upgrade --force-reinstall
 # brew install --cask ngrok
 # ngrok config add-authtoken 2tfWBwF05kG3bSzxVD2JyizdDkY_2fsHFYSxPABgGQ53ezSMa
 # ngrok http 5000
-
-
 # find . | grep __pycache__ | xargs rm -r

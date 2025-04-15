@@ -2,9 +2,10 @@ from agents import Agent
 from pydantic import BaseModel, Field
 from copiloto_context import CopilotoContext
 from db.comportamento import salvar_comportamento
+from datetime import datetime
 
 
-# 🔐 Novo schema válido para o agente
+# 🔐 Schema de output para análise comportamental
 class ComportamentoSchema(BaseModel):
     personalidade: str = Field(..., description="Resumo da personalidade do usuário")
     emocao: str = Field(..., description="Emoção predominante detectada")
@@ -14,36 +15,63 @@ class ComportamentoSchema(BaseModel):
     linguagem_preferida: str = Field(..., description="Tipo de linguagem mais adequada")
     tom_recomendado: str = Field(..., description="Tom de comunicação ideal")
 
-# 🧠 Agente de análise comportamental
+
+# 🧠 Agente especializado em análise comportamental
 comportamento_agent = Agent(
     name="Analista Comportamental",
     instructions="""
 Você é um analista especialista em comportamento humano e comunicação empática.
 
-Com base na mensagem do usuário, extraia o máximo de informações possíveis nos seguintes campos:
-- personalidade (resumida em uma frase)
-- emoções detectadas
-- traços de comunicação (ex.: objetivo, ansioso, introspectivo, etc.)
-- possíveis dores ou desafios
-- possíveis desejos
-- tipo de linguagem que parece preferir (ex.: informal, direta, amigável, técnica)
-- tom adequado para se comunicar com essa pessoa
+Sua função é analisar a mensagem recebida com base no contexto emocional e histórico, buscando extrair insights claros e úteis sobre a personalidade e estilo do usuário.
 
-Responda com o JSON exato que preencha os campos do schema.
-Se não souber, use "?".
+---
+
+🎯 Responda preenchendo um JSON com os seguintes campos:
+- **personalidade:** resumo da personalidade percebida
+- **emocao:** emoção predominante ou recorrente
+- **traços_comunicacao:** ex: objetivo, reflexivo, ansioso, desconfiado...
+- **dores:** dores, bloqueios ou desafios percebidos
+- **desejos:** aspirações ou necessidades implícitas
+- **linguagem_preferida:** ex: leve, empática, direta, técnica...
+- **tom_recomendado:** como o copiloto deve se comunicar com essa pessoa
+
+---
+
+📌 Dicas:
+- Use o histórico (`context.historico`) e alerta emocional (`context.alerta_emocional`) para identificar padrões de repetição ou travas.
+- Evite repetir o que o usuário disse. Gere uma análise genuína com base na intenção por trás da fala.
+- Seja claro, sintético e profundo. Evite respostas genéricas.
+- Se não souber algum campo, use "?" como valor.
+
+Exemplo de resposta:
+{
+  "personalidade": "Reflexivo, curioso e sensível ao julgamento.",
+  "emocao": "Frustração com progresso pessoal",
+  "traços_comunicacao": "Direto e introspectivo",
+  "dores": "Autocrítica e falta de clareza nas prioridades",
+  "desejos": "Avançar com leveza e propósito",
+  "linguagem_preferida": "Motivacional e acolhedora",
+  "tom_recomendado": "Gentil, encorajador e direto ao ponto"
+}
 """,
     output_type=ComportamentoSchema,
 )
 
-# 🎯 Função de execução isolada
+
+# 🔁 Função que executa o agente e salva o resultado no banco
 async def executor_comportamento(mensagem: str, contexto: CopilotoContext):
     from agents import Runner
-    resultado = await Runner.run(comportamento_agent, mensagem, context=contexto)
+
+    resultado = await Runner.run(comportamento_agent, input=mensagem, context=contexto)
     dados = resultado.final_output
 
-    print("🧠 Resultado do agente de comportamento:", dados)
+    if not dados:
+        print("⚠️ Nenhum dado retornado pelo agente de comportamento.")
+        return None
 
-    # Salva no banco
-    salvar_comportamento(contexto.wa_id, dados.model_dump())
+    dados_dict = dados.model_dump()
+    dados_dict["timestamp"] = datetime.utcnow()
+
+    print("🧠 Resultado do agente de comportamento:", dados_dict)
+    salvar_comportamento(contexto.wa_id, dados_dict)
     return dados
-

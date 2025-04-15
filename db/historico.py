@@ -1,33 +1,39 @@
-# --- db/historico.py ---
 from db.mongo import db
 from datetime import datetime
 
 historico_collection = db["historico"]
-#historico_collection = db["historico_conversas"]
 
-
-
-def salvar_mensagem(wa_id, origem, texto):
+def salvar_mensagem(wa_id, origem, texto, message_id=None, agente=None):
     historico_collection.insert_one({
         "wa_id": wa_id,
-        "origem": origem,  # "usuario" ou "copiloto"
+        "origem": origem,  # "usuario" ou nome do agente
         "mensagem": texto,
-        "timestamp": datetime.utcnow()
+        "agente": agente or (origem if origem != "usuario" else None),
+        "timestamp": datetime.utcnow(),
+        "message_id": message_id  # pode ser None se não for via webhook
     })
-    #print(f"💾 Mensagem registrada: [{origem}] {texto}")
+    print(f"💾 Mensagem registrada de {origem}: {texto}")
 
-def registrar_mensagem(wa_id, origem, conteudo, timestamp=None):
+def registrar_mensagem(wa_id, origem, conteudo, timestamp=None, agente=None):
     historico_collection.insert_one({
         "wa_id": wa_id,
-        "origem": origem,  # "usuario" ou "copiloto"
+        "origem": origem,
         "conteudo": conteudo,
-        "timestamp": timestamp or int(datetime.utcnow().timestamp())
+        "agente": agente or (origem if origem != "usuario" else None),
+        "timestamp": timestamp or datetime.utcnow()
     })
-    print("💾 Mensagem atualizada:")
+    print("💾 Mensagem atualizada (registrar_mensagem)")
 
-def consultar_historico(wa_id, limite=10):
-    mensagens = historico_collection.find({"wa_id": wa_id}).sort("timestamp", -1).limit(limite)
-    return list(mensagens)[::-1]  # ordem cronológica normal
+def consultar_historico(wa_id, limite=10, agente=None):
+    filtro = {"wa_id": wa_id}
+    if agente:
+        filtro["$or"] = [
+            {"origem": "usuario"},
+            {"agente": agente}
+        ]
+
+    mensagens = historico_collection.find(filtro).sort("timestamp", -1).limit(limite)
+    return list(mensagens)[::-1]  # ordem cronológica
 
 
 def consultar_historico_com_agente(wa_id, agente_nome, limite=10):
