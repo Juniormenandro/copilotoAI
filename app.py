@@ -1,7 +1,7 @@
 # app.py 
-from flask import Flask, request, Response, render_template
-from dotenv import load_dotenv
-from pymongo import MongoClient
+from flask import Flask, request, Response, render_template # type: ignore
+from dotenv import load_dotenv # type: ignore
+from pymongo import MongoClient # type: ignore
 from db.users import salvar_ou_atualizar_usuario
 from db.historico import salvar_mensagem, consultar_historico
 from db.comportamento import consultar_comportamento
@@ -10,12 +10,12 @@ from jobs.scheduler import iniciar_agendador
 from utils.transcrever_audio import transcrever_audio_do_whatsapp
 from context.sintetizar import carregar_contexto_usuario, salvar_contexto_usuario
 from agentes_copiloto.triagem import triage_copiloto_agent
-from agents import Runner
+from agents import Runner # type: ignore
 import tempfile
-import requests
+import requests # type: ignore
 import asyncio
 import os
-from datetime import datetime
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -79,14 +79,13 @@ def webhook():
                 print("================ TESTE: TRIAGEM INTELIGENTE =================")
                 contexto = asyncio.run(carregar_contexto_usuario(wa_id))
                 resposta = asyncio.run(Runner.run(triage_copiloto_agent, input=user_message, context=contexto))
-                resposta_texto = resposta.final_output.strip()
+                #resposta_texto = resposta.final_output.strip()
                 asyncio.run(salvar_contexto_usuario(wa_id, contexto))
-                print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
-
-                #resposta_texto = getattr(resposta, "final_output", str(resposta))
+                resposta_texto = getattr(resposta, "final_output", str(resposta))
                 print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
                 salvar_mensagem(wa_id, "copiloto", resposta_texto)
                 enviar_resposta(wa_id, resposta_texto)
+                print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
                 return Response(status=200)
             except Exception as e:
                 print("❌ Erro ao processar a mensagem:", e)

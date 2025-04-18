@@ -2,7 +2,8 @@
 from db.tarefas import registrar_tarefa, listar_tarefas, concluir_tarefa, adiar_tarefa
 from db.memorias import salvar_memoria, consultar_objetivo_da_semana
 from utils.data import interpretar_data_relativa
-from datetime import datetime, date
+from datetime import date
+from dateutil import parser # type: ignore
 import re
 
 
@@ -93,6 +94,14 @@ def registrar_tarefa_tool(wa_id: int, descricao: str = None, data_entrega: str =
 
 
 
+
+
+
+
+
+from datetime import date
+from dateutil import parser  # <-- importar o parser no topo
+
 # 📋 ============= LISTAR TAREFAS ========================
 def listar_tarefas_tool(wa_id: int) -> dict:
     print(f"📋 Listando tarefas para {wa_id}")
@@ -109,7 +118,12 @@ def listar_tarefas_tool(wa_id: int) -> dict:
         if not entrega:
             tarefas_futuras.append(f"- {descricao}")
         else:
-            entrega_date = date.fromisoformat(entrega)
+            try:
+                entrega_date = parser.parse(entrega).date()  # <-- parse flexível
+            except Exception as e:
+                print(f"❌ Erro ao interpretar data: {entrega} | Erro: {e}")
+                continue  # ignora essa tarefa com data inválida
+
             hoje = date.today()
             if entrega_date < hoje:
                 tarefas_vencidas.append(f"- {descricao} (Vencida em: {entrega_date.strftime('%Y-%m-%d')})")
