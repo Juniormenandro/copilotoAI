@@ -2,6 +2,8 @@ import os
 import subprocess
 from openai import OpenAI
 from deep_translator import GoogleTranslator
+from langdetect import detect
+
 
 client = OpenAI()
 translator = GoogleTranslator()
@@ -52,8 +54,6 @@ def transcrever_audio_do_whatsapp(arquivo_ogg):
 
     # Passo 3: Tradução condicional
     try:
-        from langdetect import detect
-
         idioma_detectado = detect(texto_transcrito)
         print(f"🔍 Idioma detectado: {idioma_detectado}")
 

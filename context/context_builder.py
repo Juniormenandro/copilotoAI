@@ -1,11 +1,11 @@
 from typing import Dict, List
-from copiloto_context import CopilotoContext
+from copilotoAI.context.copiloto_context import CopilotoContext
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 from agents import Runner
 import logging
-from comportamento_agent import comportamento_agent
+from copilotoAI.agentes_copiloto.comportamento_agent import comportamento_agent
 from db.comportamento import salvar_comportamento
 
 # Setup de logging

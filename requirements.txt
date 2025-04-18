@@ -25,18 +25,30 @@ pyngrok>=5.3.0
 
 # Interface para análise com painel
 streamlit>=1.32.2
+wordcloud
+
 
 # -----------------------------
 # COMO INSTALAR DEPENDÊNCIAS
 # -----------------------------
 # Para Windows/macOS/Linux:
 # Crie um ambiente virtual e ative:
-# python -m venv venv
+
+# python3 -m venv venv
+
 # source venv/bin/activate  (Linux/Mac)
 # venv\Scripts\activate     (Windows)
 
 # Instale as dependências:
+# pip install --upgrade pip
 # pip install -r requirements.txt
+
+# brew tap mongodb/brew
+# brew install mongodb-community
+# brew services start mongodb-community
+# pip install pymongo pandas streamlit matplotlib wordcloud python-dotenv
+
+
 
 # -----------------------------
 # COMANDOS PARA INICIAR O PROJETO
@@ -46,7 +58,7 @@ streamlit>=1.32.2
 # python app.py
 
 # 2. Em outro terminal, rode o painel Streamlit:
-# streamlit run painel.py
+# streamlit run painel_streamlit.py
 
 # 3. Em outro terminal, inicie o Ngrok para expor o webhook:
 # ngrok http 5000
@@ -69,6 +81,7 @@ streamlit>=1.32.2
 # pip install "httpx>=0.23.0" "httpcore>=1.0.0"
 # brew install ffmpeg
 # pip install langdetect
+# pip install dateparser
 
 
 # openai>=1.0.0

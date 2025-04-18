@@ -1,7 +1,7 @@
 from db.tarefas import listar_tarefas
 from db.memorias import consultar_objetivo_da_semana
 from core.mensageiro import enviar_resposta
-from core.mongo import db
+from db.mongo import db
 
 def enviar_resumo_semanal():
     print("📅 Rodando resumo semanal...")

@@ -3,7 +3,7 @@ from db.users import consultar_perfil_usuario
 from db.tarefas import listar_tarefas
 from db.memorias import consultar_objetivo_da_semana
 from core.mensageiro import enviar_resposta
-from core.mongo import db
+from db.mongo import db
 from datetime import datetime
 from db.comportamento import consultar_comportamento
 from jobs.resumo import enviar_resumo_semanal

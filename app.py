@@ -1,3 +1,4 @@
+# app.py 
 from flask import Flask, request, Response, render_template
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -6,14 +7,15 @@ from db.historico import salvar_mensagem, consultar_historico
 from db.comportamento import consultar_comportamento
 from core.mensageiro import enviar_resposta
 from jobs.scheduler import iniciar_agendador
-from copiloto_agents import triage_agent
-from context.context_builder import processar_mensagem_usuario
 from utils.transcrever_audio import transcrever_audio_do_whatsapp
+from context.sintetizar import carregar_contexto_usuario, salvar_contexto_usuario
+from agentes_copiloto.triagem import triage_copiloto_agent
 from agents import Runner
 import tempfile
 import requests
 import asyncio
 import os
+from datetime import datetime
 
 load_dotenv()
 app = Flask(__name__)
@@ -24,7 +26,8 @@ PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
-db = client.copilotoAI
+db = client["copilotoAI"]
+users_collection = db["users"]
 
 @app.route("/")
 def index():
@@ -70,28 +73,24 @@ def webhook():
             salvar_ou_atualizar_usuario(wa_id, user_message)
             salvar_mensagem(wa_id, "usuario", user_message)
             print(f"📥 Mensagem recebida: '{user_message}' de {nome} ({wa_id})")
+            
             try:
-                comportamento = consultar_comportamento(wa_id)
-                historico = consultar_historico(wa_id)
-                contexto = {
-                    "wa_id": wa_id,
-                    "comportamento": comportamento,
-                    "historico": historico
-                }
+                # resposta = asyncio.run(Runner.run(triage_agent, input=user_message, context=contexto))
+                print("================ TESTE: TRIAGEM INTELIGENTE =================")
+                contexto = asyncio.run(carregar_contexto_usuario(wa_id))
+                resposta = asyncio.run(Runner.run(triage_copiloto_agent, input=user_message, context=contexto))
+                resposta_texto = resposta.final_output.strip()
+                asyncio.run(salvar_contexto_usuario(wa_id, contexto))
+                print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
 
-                resposta = asyncio.run(
-                    Runner.run(triage_agent, input=user_message, context=contexto)
-                )
-
-                resposta_texto = getattr(resposta, "final_output", str(resposta))
+                #resposta_texto = getattr(resposta, "final_output", str(resposta))
                 print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
                 salvar_mensagem(wa_id, "copiloto", resposta_texto)
                 enviar_resposta(wa_id, resposta_texto)
-                
                 return Response(status=200)
             except Exception as e:
                 print("❌ Erro ao processar a mensagem:", e)
-
+        
         elif mensagem["type"] == "audio":
             try:
                 audio_id = mensagem["audio"]["id"]
@@ -125,61 +124,26 @@ def webhook():
                 print(f"🎙️ Transcrição do áudio: '{user_message}' de {nome} ({wa_id})")
 
                 try:
-                    comportamento = consultar_comportamento(wa_id)
-                    historico = consultar_historico(wa_id)
-                    contexto = {
-                        "wa_id": wa_id,
-                        "comportamento": comportamento,
-                        "historico": historico
-                    }
-
-                    resposta = asyncio.run(
-                        Runner.run(triage_agent, input=user_message, context=contexto)
-                    )
-
-                    resposta_texto = getattr(resposta, "final_output", str(resposta))
-                    print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
+                    print("================ TESTE: TRIAGEM INTELIGENTE =================")
+                    contexto = asyncio.run(carregar_contexto_usuario(wa_id))
+                    resposta = asyncio.run(Runner.run(triage_copiloto_agent, input=user_message, context=contexto))
+                    resposta_texto = resposta.final_output.strip()
+                    asyncio.run(salvar_contexto_usuario(wa_id, contexto))
                     salvar_mensagem(wa_id, "copiloto", resposta_texto)
                     enviar_resposta(wa_id, resposta_texto)
-                    
+                    print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
                     return Response(status=200)
-
                 except Exception as e:
                     print("❌ Erro ao processar a mensagem:", e)
-                    
-
+                
             except Exception as e:
                 print("❌ Erro ao processar áudio:", e)
                 user_message = "Não consegui entender o áudio. Pode tentar digitar?"
-
         else:
             print("⚠️ Tipo de mensagem não suportado:", mensagem["type"])
             return Response(status=200)
-
-    #     try:
-    #         comportamento = consultar_comportamento(wa_id)
-    #         historico = consultar_historico(wa_id)
-    #         contexto = {
-    #             "wa_id": wa_id,
-    #             "comportamento": comportamento,
-    #             "historico": historico
-    #         }
-
-    #         resposta = asyncio.run(
-    #             Runner.run(triage_agent, input=user_message, context=contexto)
-    #         )
-
-    #         resposta_texto = getattr(resposta, "final_output", str(resposta))
-    #         print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
-    #         salvar_mensagem(wa_id, "copiloto", resposta_texto)
-    #         enviar_resposta(wa_id, resposta_texto)
-
-    #     except Exception as e:
-    #         print("❌ Erro ao processar a mensagem:", e)
-
-    # return Response(status=200)
-
+        
 iniciar_agendador()
-if __name__ == "__main__": 
+if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     app.run(debug=False, host="0.0.0.0", port=port)

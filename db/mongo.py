@@ -13,6 +13,7 @@ if not mongo_uri:
 client = MongoClient(mongo_uri)
 db = client["copilotoAI"]
 
+
 def salvar_mensagem(wa_id: str, origem: str, mensagem: str) -> None:
     """Salva uma mensagem no histórico no MongoDB."""
     try:

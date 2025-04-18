@@ -3,19 +3,24 @@ from datetime import datetime
 from difflib import get_close_matches
 
 tarefas_collection = db["tarefas"]
+print(f"🚀 Conectado à coleção tarefas: {tarefas_collection.name}")
 
 
 def registrar_tarefa(wa_id, descricao, prioridade="normal", data_entrega=None):
     print(f"💾 Registrando no Mongo: {wa_id}, {descricao}, {data_entrega}")
-    tarefa = {
-        "wa_id": wa_id,
-        "descricao": descricao.strip(),
-        "status": "pendente",
-        "prioridade": prioridade,
-        "data_criacao": datetime.now().strftime("%Y-%m-%d"),
-        "data_entrega": data_entrega
-    }
-    tarefas_collection.insert_one(tarefa)
+    try:
+        tarefa = {
+            "wa_id": wa_id,
+            "descricao": descricao.strip(),
+            "status": "pendente",
+            "prioridade": prioridade,
+            "data_criacao": datetime.now().strftime("%Y-%m-%d"),
+            "data_entrega": data_entrega
+        }
+        result = tarefas_collection.insert_one(tarefa)
+        print(f"✅ Tarefa salva no Mongo com _id: {result.inserted_id}")
+    except Exception as e:
+        print(f"❌ Erro ao salvar tarefa no Mongo: {e}")
 
 
 def listar_tarefas(wa_id, status="pendente"):

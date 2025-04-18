@@ -24,7 +24,7 @@ def registrar_mensagem(wa_id, origem, conteudo, timestamp=None, agente=None):
     })
     print("💾 Mensagem atualizada (registrar_mensagem)")
 
-def consultar_historico(wa_id, limite=10, agente=None):
+def consultar_historico(wa_id, limite=30, agente=None):
     filtro = {"wa_id": wa_id}
     if agente:
         filtro["$or"] = [
