@@ -1,5 +1,5 @@
-from agents import Agent
-from pydantic import BaseModel, Field
+from agents import Agent, Runner # type: ignore
+from pydantic import BaseModel, Field # type: ignore
 from copilotoAI.context.copiloto_context import CopilotoContext
 from db.comportamento import salvar_comportamento
 from datetime import datetime
@@ -60,8 +60,6 @@ Exemplo de resposta:
 
 # 🔁 Função que executa o agente e salva o resultado no banco
 async def executor_comportamento(mensagem: str, contexto: CopilotoContext):
-    from agents import Runner
-
     resultado = await Runner.run(comportamento_agent, input=mensagem, context=contexto)
     dados = resultado.final_output
 

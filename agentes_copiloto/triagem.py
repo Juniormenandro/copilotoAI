@@ -1,12 +1,12 @@
-from agents import Agent, handoff
-from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
+from agents import Agent, handoff #type: ignore
+from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX #type: ignore
 from .organizador import organizador_memoria_agent
 from .optimum_writer import optimum_writer_agent
 from .emocional import emocional_comportamental_agent
 from .estrategista import estrategista_intelectual_agent
 from .solucoes_ai import solucoes_ai_em_demanda_agent
 from .spinsalinng import spinselling_agent
-
+# from .copiloto_tools import marcar_conversa_em_andamento_tool
 
 triage_copiloto_agent = Agent(
     name="triage_copiloto_agent",
@@ -15,13 +15,12 @@ triage_copiloto_agent = Agent(
     Você é o agente de triagem invisível do Copiloto IA. Seu papel é ler e entender profundamente cada mensagem do usuário, consultando o contexto, o histórico e o estado emocional atual. Com base nisso, você deve encaminhar a mensagem ao agente mais adequado para continuar a conversa. Você **nunca responde diretamente ao usuário** — apenas redireciona silenciosamente para o agente certo com o input e o contexto corretos.
 
     ⚠️ REGRAS IMPORTANTES:
-    - SEMPRE use `context['comportamento']` e `context['historico']` como base da resposta.
+    - SEMPRE use `context['historico']` como base da resposta.
     - Nunca responda ao usuário.
     - ÚNICO formato PERMITIDO DE RESPOSTA: `transfer_to_<agent_name>`.
 
     ⚙️ FUNCIONAMENTO:
     - Utilize o `context['historico']` para identificar em qual passo o usuário está e, assim, determinar o encaminhamento correto ao agente.
-    - Mantenha a variável `conversa_em_andamento` como `true`, a menos que seja explicitamente encerrada.
     - Não troque de agente sem necessidade.
 
     🎯 OBJETIVO:
@@ -55,6 +54,8 @@ triage_copiloto_agent = Agent(
     🧠 Exemplo de Uso:
     - Mensagem: “Eu só queria colocar a cabeça no lugar e seguir com calma.”  
     - Ação: `transfer_to_emocional_comportamental_agent`  
+    
+    
 
     """,
      handoffs=[
@@ -65,6 +66,30 @@ triage_copiloto_agent = Agent(
         handoff(solucoes_ai_em_demanda_agent),
         handoff(spinselling_agent),
     ]
+    # tools=[
+    #     marcar_conversa_em_andamento_tool
+    # ]
 )
 
 
+# 🔁 CONTINUIDADE DA CONVERSA
+#     📌 Sempre chame a tool `marcar_conversa_em_andamento_tool` IMEDIATAMENTE após decidir para qual agente a mensagem será roteada.  
+#     Essa tool é usada para marcar que a conversa está ativa, permitindo que o sistema mantenha o agente atual nas próximas mensagens.
+
+#     ✅ Quando chamar:
+#     - O usuário faz uma pergunta.
+#     - O usuário dá continuidade ao tema anterior.
+#     - O usuário está claramente esperando uma resposta ou orientação.
+#     - A conversa está fluindo naturalmente.
+
+#     ❌ Quando NÃO chamar:
+#     - O usuário diz que quer encerrar, parar ou "só isso".
+#     - O usuário agradece e não espera resposta.
+#     - A mensagem indica fim de conversa (ex: “valeu”, “obrigado”, “até depois”).
+
+#     🧠 Exemplos:
+#     - Mensagem: "Quais são minhas tarefas pra amanhã?"  
+#     → Ação: `transfer_to_organizador_memoria_agent` + chamar `marcar_conversa_em_andamento_tool`
+
+#     - Mensagem: "Acho que terminamos por hoje."  
+#     → Ação: não chamar nenhuma tool.

@@ -1,6 +1,6 @@
 # --- copiloto_context.py ---
 from typing import Optional, List, Dict
-from pydantic import BaseModel
+from pydantic import BaseModel # type: ignore
 
 
 class CopilotoContext(BaseModel):

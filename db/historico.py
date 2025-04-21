@@ -12,7 +12,7 @@ def salvar_mensagem(wa_id, origem, texto, message_id=None, agente=None):
         "timestamp": datetime.utcnow(),
         "message_id": message_id  # pode ser None se não for via webhook
     })
-    print(f"💾 Mensagem registrada de {origem}: {texto}")
+    # print(f"💾 Mensagem registrada de {origem}: {texto}")
 
 def registrar_mensagem(wa_id, origem, conteudo, timestamp=None, agente=None):
     historico_collection.insert_one({

@@ -3,12 +3,12 @@ from flask import Flask, request, Response, render_template # type: ignore
 from dotenv import load_dotenv # type: ignore
 from pymongo import MongoClient # type: ignore
 from db.users import salvar_ou_atualizar_usuario
-from db.historico import salvar_mensagem, consultar_historico
-from db.comportamento import consultar_comportamento
+from db.historico import salvar_mensagem
 from core.mensageiro import enviar_resposta
 from jobs.scheduler import iniciar_agendador
 from utils.transcrever_audio import transcrever_audio_do_whatsapp
-from context.sintetizar import carregar_contexto_usuario, salvar_contexto_usuario
+from context.sintetizar import salvar_contexto_usuario
+from context.verificar_conversa import verificar_necessidade_resumo
 from agentes_copiloto.triagem import triage_copiloto_agent
 from agents import Runner # type: ignore
 import tempfile
@@ -67,7 +67,7 @@ def webhook():
 
         wa_id = mensagem["from"]
         nome = data["entry"][0]["changes"][0]["value"].get("contacts", [{}])[0].get("profile", {}).get("name", "amigo")
-
+        
         if mensagem["type"] == "text":
             user_message = mensagem["text"]["body"]
             salvar_ou_atualizar_usuario(wa_id, user_message)
@@ -75,12 +75,18 @@ def webhook():
             print(f"📥 Mensagem recebida: '{user_message}' de {nome} ({wa_id})")
             
             try:
-                # resposta = asyncio.run(Runner.run(triage_agent, input=user_message, context=contexto))
                 print("================ TESTE: TRIAGEM INTELIGENTE =================")
-                contexto = asyncio.run(carregar_contexto_usuario(wa_id))
+                contexto = asyncio.run(verificar_necessidade_resumo(wa_id, user_message ))
+                if isinstance(contexto, str):
+                    resposta = contexto.strip()
+                    print(f"_❓__❓_⚡ Resposta direta do agente ativo: {resposta}")
+                    salvar_mensagem(wa_id, "copiloto", resposta)
+                    enviar_resposta(wa_id, resposta)
+                    print("================ AGENTE DIRETO — FIM =================")
+                    return Response(status=200)
+
                 resposta = asyncio.run(Runner.run(triage_copiloto_agent, input=user_message, context=contexto))
-                #resposta_texto = resposta.final_output.strip()
-                asyncio.run(salvar_contexto_usuario(wa_id, contexto))
+                # asyncio.run(salvar_contexto_usuario(wa_id, contexto))
                 resposta_texto = getattr(resposta, "final_output", str(resposta))
                 print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
                 salvar_mensagem(wa_id, "copiloto", resposta_texto)
@@ -93,7 +99,6 @@ def webhook():
         elif mensagem["type"] == "audio":
             try:
                 audio_id = mensagem["audio"]["id"]
-                
                 # Primeiro, obtém URL final para download
                 media_info_url = f"https://graph.facebook.com/v17.0/{audio_id}"
                 headers = {"Authorization": f"Bearer {WHATSAPP_TOKEN}"}
@@ -124,7 +129,15 @@ def webhook():
 
                 try:
                     print("================ TESTE: TRIAGEM INTELIGENTE =================")
-                    contexto = asyncio.run(carregar_contexto_usuario(wa_id))
+                    contexto = asyncio.run(verificar_necessidade_resumo(wa_id, user_message))
+                    if isinstance(contexto, str):
+                        resposta = contexto.strip()
+                        print(f"_❓__❓_⚡ Resposta direta do agente ativo: {resposta}")
+                        salvar_mensagem(wa_id, "copiloto", resposta)
+                        enviar_resposta(wa_id, resposta)
+                        print("================ AGENTE DIRETO — FIM =================")
+                        return Response(status=200)
+
                     resposta = asyncio.run(Runner.run(triage_copiloto_agent, input=user_message, context=contexto))
                     resposta_texto = resposta.final_output.strip()
                     asyncio.run(salvar_contexto_usuario(wa_id, contexto))

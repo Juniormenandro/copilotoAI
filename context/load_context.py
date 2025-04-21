@@ -1,7 +1,7 @@
-from pymongo import MongoClient
+from pymongo import MongoClient # type: ignore
 from datetime import datetime, timezone, timedelta
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 
 load_dotenv()
 

@@ -1,7 +1,7 @@
-from pymongo import MongoClient
-from datetime import datetime
-from dotenv import load_dotenv
-from datetime import datetime, timezone
+from pymongo import MongoClient # type: ignore
+from datetime import datetime 
+from dotenv import load_dotenv # type: ignore
+from datetime import datetime, timezone # type: ignore
 import os
 
 # Carrega variáveis de ambiente

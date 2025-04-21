@@ -3,7 +3,7 @@ from datetime import datetime
 from difflib import get_close_matches
 
 tarefas_collection = db["tarefas"]
-print(f"🚀 Conectado à coleção tarefas: {tarefas_collection.name}")
+# print(f"🚀 Conectado à coleção tarefas: {tarefas_collection.name}")
 
 
 def registrar_tarefa(wa_id, descricao, prioridade="normal", data_entrega=None):
