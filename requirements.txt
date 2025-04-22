@@ -1,41 +1,48 @@
-# requirements.txt - dependências do projeto Copiloto IA
+# ============ DEPENDÊNCIAS PRINCIPAIS ============
 
-# OpenAI SDK para transcrição com Whisper
+# SDK OpenAI para agentes e transcrição Whisper
 openai>=1.10.0
+# Caso use agents SDK oficial da OpenAI:
+openai-agents>=0.1.0
 
-# Transcrição e tradução
-deep-translator>=1.11.4
-langdetect>=1.0.9
+# Flask API
+Flask>=2.2.5
+requests>=2.31.0
+gunicorn>=21.2.0  # Necessário para deploy no Railway
+
+# MongoDB
+pymongo>=4.6.1
+python-dotenv>=1.0.1
 
 # Manipulação de áudio
 ffmpeg-python>=0.2.0
 
-# API Flask
-Flask>=2.2.5
-requests>=2.31.0
+# Transcrição, tradução e linguagem
+deep-translator>=1.11.4
+langdetect>=1.0.9
+dateparser>=1.2.0
 
-# Banco de dados
-pymongo>=4.6.1
-
-# Assíncrono
+# Async
 aiohttp>=3.9.3
 
-# Webhook seguro via tunelamento (Ngrok CLI)
+# Webhook local (para testes)
 pyngrok>=5.3.0
 
-# Interface para análise com painel
+# Painel de análise
 streamlit>=1.32.2
-wordcloud
+wordcloud>=1.8.2.2
 
+# ============ DEPENDÊNCIAS OPCIONAIS ============
+# googletrans==4.0.0-rc1  # Alternativa ao deep-translator
+# httpx>=0.23.0
+# httpcore>=1.0.0
+# pydub>=0.25.1
 
 # -----------------------------
 # COMO INSTALAR DEPENDÊNCIAS
-# -----------------------------
 # Para Windows/macOS/Linux:
 # Crie um ambiente virtual e ative:
-
 # python3 -m venv venv
-
 # source venv/bin/activate  (Linux/Mac)
 # venv\Scripts\activate     (Windows)
 
