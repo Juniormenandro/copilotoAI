@@ -71,7 +71,7 @@ def webhook():
             user_message = mensagem["text"]["body"]
             salvar_ou_atualizar_usuario(wa_id, user_message)
             salvar_mensagem(wa_id, "usuario", user_message)
-           # print(f"📥 Mensagem recebida: '{user_message}' de {nome} ({wa_id})")
+            print(f"📥 Mensagem recebida: '{user_message}' de {nome} ({wa_id})")
             
             try:
                # print("================ TESTE: TRIAGEM INTELIGENTE =================")
