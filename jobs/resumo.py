@@ -4,7 +4,7 @@ from core.mensageiro import enviar_resposta
 from db.mongo import db
 
 def enviar_resumo_semanal():
-    print("📅 Rodando resumo semanal...")
+   # print("📅 Rodando resumo semanal...")
 
     usuarios = db["users"].find()
 

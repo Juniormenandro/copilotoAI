@@ -61,14 +61,14 @@ async def carregar_contexto_simples(wa_id: str) -> dict:
 
 #------------ verifica se a conversa esta em andamento -----------------#
 async def verificar_necessidade_resumo(wa_id: str, mensagem) -> dict:
-    print(f"\n_🔎 _ Verificando se precisa resumir para {wa_id}...")
+   # print(f"\n_🔎 _ Verificando se precisa resumir para {wa_id}...")
     # 1. Busca dados atuais do usuário
     usuario = users_collection.find_one({"wa_id": wa_id}) or {}
     ultima_interacao = usuario.get("ultima_interacao")
     agente_em_conversa = usuario.get("agente_em_conversa")
     conversa_em_andamento = usuario.get("conversa_em_andamento")
-    print(f"\n_🔎 _verificar_necessidade_resumo = {agente_em_conversa}")
-    print(f"\n_🔎 _verificar_necessidade_resumo = {conversa_em_andamento}")
+   # print(f"\n_🔎 _verificar_necessidade_resumo = {agente_em_conversa}")
+   # print(f"\n_🔎 _verificar_necessidade_resumo = {conversa_em_andamento}")
     minutos_inativo = None
     if ultima_interacao:
         if ultima_interacao.tzinfo is None:
@@ -78,25 +78,25 @@ async def verificar_necessidade_resumo(wa_id: str, mensagem) -> dict:
 
     # 2. Decide qual contexto carregar
     if minutos_inativo is not None and minutos_inativo > 120:
-        print(f"_⏱️ _ Inativo há {minutos_inativo:.2f} minutos — usando contexto completo.")
+      #  print(f"_⏱️ _ Inativo há {minutos_inativo:.2f} minutos — usando contexto completo.")
         contexto_simples = await carregar_contexto_simples(wa_id)
         historico = contexto_simples["historico"]
         contexto = await carregar_contexto_usuario(wa_id, historico)
         return contexto
 
     elif conversa_em_andamento is True and agente_em_conversa:
-        print(f"_🔁_ Conversa ainda em andamento — redirecionando para agente ativo: {agente_em_conversa}")
+       # print(f"_🔁_ Conversa ainda em andamento — redirecionando para agente ativo: {agente_em_conversa}")
         contexto_simples = await carregar_contexto_simples(wa_id)
         agente = AGENTES_REGISTRADOS.get(agente_em_conversa)
         if not agente:
             historico = contexto_simples["historico"]
             contexto = await carregar_contexto_usuario(wa_id, historico)
-            print(f"_🔁_📍_⚠️ Agente '{agente_em_conversa}' não encontrado. Indo para fallback da triagem.")
+           # print(f"_🔁_📍_⚠️ Agente '{agente_em_conversa}' não encontrado. Indo para fallback da triagem.")
             return {"contexto": contexto, "mensagem": mensagem}
-        print("_🧪_ Antes de alterar:", contexto_simples.get("conversa_em_andamento"))
+      # print("_🧪_ Antes de alterar:", contexto_simples.get("conversa_em_andamento"))
         contexto_simples["conversa_em_andamento"] = False
         contexto_simples["agente_em_conversa"] = ""
-        print("_🧪_ Depois de alterar:", contexto_simples.get("conversa_em_andamento", contexto_simples.get("agente_em_conversa")))
+       # print("_🧪_ Depois de alterar:", contexto_simples.get("conversa_em_andamento", contexto_simples.get("agente_em_conversa")))
         resposta = await Runner.run(
             agente,
             input=mensagem,
@@ -104,10 +104,10 @@ async def verificar_necessidade_resumo(wa_id: str, mensagem) -> dict:
         )
         #print(f"_🔁_📤 salvando Resposta do agente = {contexto}")
         await salvar_contexto_usuario(wa_id, contexto_simples)
-        print("_🔁_======== Fim da lógica do agent direto ===========🔁 ")
+       # print("_🔁_======== Fim da lógica do agent direto ===========🔁 ")
         return resposta.final_output
     else:
-        print(f"_🔁_📍_ Conversa inativa ou encerrada — redirecionando para triagem.")
+       # print(f"_🔁_📍_ Conversa inativa ou encerrada — redirecionando para triagem.")
         contexto_simples = await carregar_contexto_simples(wa_id)
         historico = contexto_simples["historico"]
         contexto = await carregar_contexto_usuario(wa_id, historico)

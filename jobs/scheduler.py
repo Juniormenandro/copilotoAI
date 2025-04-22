@@ -1,4 +1,5 @@
-from apscheduler.schedulers.background import BackgroundScheduler
+from sched import scheduler
+from apscheduler.schedulers.background import BackgroundScheduler # type: ignore
 from db.users import consultar_perfil_usuario
 from db.tarefas import listar_tarefas
 from db.memorias import consultar_objetivo_da_semana
@@ -10,7 +11,7 @@ from jobs.resumo import enviar_resumo_semanal
 
 
 def checkin_diario():
-    print("⏰ Executando check-in diário...")
+   # print("⏰ Executando check-in diário...")
 
 
 
@@ -39,7 +40,7 @@ def checkin_diario():
 
 
 def lembrar_tarefas_do_dia():
-    print("🔔 Buscando tarefas com data de hoje...")
+   # print("🔔 Buscando tarefas com data de hoje...")
 
     hoje = datetime.now().strftime("%Y-%m-%d")
 
@@ -62,7 +63,7 @@ def lembrar_tarefas_do_dia():
         enviar_resposta(wa_id, msg)
 
 def reforco_emocional():
-    print("💬 Enviando reforços emocionais...")
+   # print("💬 Enviando reforços emocionais...")
 
     usuarios = db["users"].find()
     for user in usuarios:
@@ -96,7 +97,7 @@ def reforco_emocional():
 
 def iniciar_agendador():
     scheduler.start()
-    print("✅ Agendador de tarefas iniciado.")
+  #  print("✅ Agendador de tarefas iniciado.")
 
 
 
@@ -114,7 +115,7 @@ def iniciar_agendador():
 
 
     scheduler.start()
-    print("✅ Agendador iniciado com sucesso.")
+   # print("✅ Agendador iniciado com sucesso.")
 
 
 

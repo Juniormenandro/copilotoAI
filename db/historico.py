@@ -22,7 +22,7 @@ def registrar_mensagem(wa_id, origem, conteudo, timestamp=None, agente=None):
         "agente": agente or (origem if origem != "usuario" else None),
         "timestamp": timestamp or datetime.utcnow()
     })
-    print("💾 Mensagem atualizada (registrar_mensagem)")
+   # print("💾 Mensagem atualizada (registrar_mensagem)")
 
 def consultar_historico(wa_id, limite=30, agente=None):
     filtro = {"wa_id": wa_id}

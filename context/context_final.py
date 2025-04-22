@@ -72,4 +72,4 @@ users.update_one(
     upsert=True
 )
 
-print("✅ Dados simulados inseridos com sucesso no MongoDB!")
+# print("✅ Dados simulados inseridos com sucesso no MongoDB!")

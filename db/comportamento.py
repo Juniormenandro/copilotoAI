@@ -21,7 +21,7 @@ def criar_comportamento_padrao(wa_id):
     existente = comportamento_collection.find_one({"wa_id": wa_id})
     if not existente:
         comportamento_collection.insert_one(comportamento)
-        print(f"🧠 Perfil comportamental padrão salvo para {wa_id}")
+       # print(f"🧠 Perfil comportamental padrão salvo para {wa_id}")
 
 def salvar_comportamento(wa_id, novos_dados):
     existentes = comportamento_collection.find_one({"wa_id": wa_id})
@@ -33,7 +33,7 @@ def salvar_comportamento(wa_id, novos_dados):
             "timestamp": datetime.utcnow()
         }
         comportamento_collection.insert_one(comportamento)
-        print(f"🧠 Comportamento criado para {wa_id}")
+       # print(f"🧠 Comportamento criado para {wa_id}")
         return
 
     atualizacoes = {}
@@ -48,7 +48,7 @@ def salvar_comportamento(wa_id, novos_dados):
             {"wa_id": wa_id},
             {"$set": atualizacoes}
         )
-        print(f"🧠 Campos atualizados para {wa_id}: {list(atualizacoes.keys())}")
+       # print(f"🧠 Campos atualizados para {wa_id}: {list(atualizacoes.keys())}")
     else:
         print(f"✅ Nenhuma mudança detectada para {wa_id}, nada foi alterado.")
 

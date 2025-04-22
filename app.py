@@ -16,7 +16,6 @@ import requests # type: ignore
 import asyncio
 import os
 
-
 load_dotenv()
 app = Flask(__name__)
 
@@ -53,16 +52,16 @@ def webhook():
     try:
         mensagens = data["entry"][0]["changes"][0]["value"].get("messages")
         if not mensagens:
-            print("⚠️ Nenhuma mensagem recebida")
+          #  print("⚠️ Nenhuma mensagem recebida")
             return Response(status=200)
     except (KeyError, IndexError):
-        print("⚠️ Erro no formato da mensagem")
+       # print("⚠️ Erro no formato da mensagem")
         return Response(status=200)
 
     for mensagem in mensagens:
         message_id = mensagem.get("id")
         if db.historico.find_one({"message_id": message_id}):
-            print("⚠️ Mensagem já processada. Ignorando.")
+           # print("⚠️ Mensagem já processada. Ignorando.")
             continue
 
         wa_id = mensagem["from"]
@@ -72,26 +71,26 @@ def webhook():
             user_message = mensagem["text"]["body"]
             salvar_ou_atualizar_usuario(wa_id, user_message)
             salvar_mensagem(wa_id, "usuario", user_message)
-            print(f"📥 Mensagem recebida: '{user_message}' de {nome} ({wa_id})")
+           # print(f"📥 Mensagem recebida: '{user_message}' de {nome} ({wa_id})")
             
             try:
-                print("================ TESTE: TRIAGEM INTELIGENTE =================")
+               # print("================ TESTE: TRIAGEM INTELIGENTE =================")
                 contexto = asyncio.run(verificar_necessidade_resumo(wa_id, user_message ))
                 if isinstance(contexto, str):
                     resposta = contexto.strip()
-                    print(f"_❓__❓_⚡ Resposta direta do agente ativo: {resposta}")
+                   # print(f"_❓__❓_⚡ Resposta direta do agente ativo: {resposta}")
                     salvar_mensagem(wa_id, "copiloto", resposta)
                     enviar_resposta(wa_id, resposta)
-                    print("================ AGENTE DIRETO — FIM =================")
+                  #  print("================ AGENTE DIRETO — FIM =================")
                     return Response(status=200)
 
                 resposta = asyncio.run(Runner.run(triage_copiloto_agent, input=user_message, context=contexto))
                 # asyncio.run(salvar_contexto_usuario(wa_id, contexto))
                 resposta_texto = getattr(resposta, "final_output", str(resposta))
-                print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
+               # print(f"✅ Resultado extraído com .final_output: {resposta_texto}")
                 salvar_mensagem(wa_id, "copiloto", resposta_texto)
                 enviar_resposta(wa_id, resposta_texto)
-                print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
+              #  print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
                 return Response(status=200)
             except Exception as e:
                 print("❌ Erro ao processar a mensagem:", e)
@@ -125,17 +124,17 @@ def webhook():
                 
                 salvar_ou_atualizar_usuario(wa_id, user_message)
                 salvar_mensagem(wa_id, "usuario", user_message)
-                print(f"🎙️ Transcrição do áudio: '{user_message}' de {nome} ({wa_id})")
+              #  print(f"🎙️ Transcrição do áudio: '{user_message}' de {nome} ({wa_id})")
 
                 try:
-                    print("================ TESTE: TRIAGEM INTELIGENTE =================")
+                  #  print("================ TESTE: TRIAGEM INTELIGENTE =================")
                     contexto = asyncio.run(verificar_necessidade_resumo(wa_id, user_message))
                     if isinstance(contexto, str):
                         resposta = contexto.strip()
-                        print(f"_❓__❓_⚡ Resposta direta do agente ativo: {resposta}")
+                      #  print(f"_❓__❓_⚡ Resposta direta do agente ativo: {resposta}")
                         salvar_mensagem(wa_id, "copiloto", resposta)
                         enviar_resposta(wa_id, resposta)
-                        print("================ AGENTE DIRETO — FIM =================")
+                     #   print("================ AGENTE DIRETO — FIM =================")
                         return Response(status=200)
 
                     resposta = asyncio.run(Runner.run(triage_copiloto_agent, input=user_message, context=contexto))
@@ -143,7 +142,7 @@ def webhook():
                     asyncio.run(salvar_contexto_usuario(wa_id, contexto))
                     salvar_mensagem(wa_id, "copiloto", resposta_texto)
                     enviar_resposta(wa_id, resposta_texto)
-                    print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
+                  #  print("================ TESTE: TRIAGEM INTELIGENTE FIM=================")
                     return Response(status=200)
                 except Exception as e:
                     print("❌ Erro ao processar a mensagem:", e)

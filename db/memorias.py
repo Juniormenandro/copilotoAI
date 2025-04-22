@@ -11,7 +11,7 @@ def salvar_memoria(wa_id, tipo, conteudo):
         "data": datetime.utcnow().strftime("%Y-%m-%d")
     }
     memorias_collection.insert_one(memoria)
-    print(f"🧠 Memória salva: {tipo} para {wa_id}")
+   # print(f"🧠 Memória salva: {tipo} para {wa_id}")
 
 
 def ja_foi_acolhido(wa_id):
@@ -32,7 +32,7 @@ def registrar_acolhimento(wa_id):
         "data": datetime.utcnow().strftime("%Y-%m-%d")
     }
     memorias_collection.insert_one(memoria)
-    print(f"🙌 Acolhimento inicial registrado para {wa_id}")
+   # print(f"🙌 Acolhimento inicial registrado para {wa_id}")
 
 
 def consultar_objetivo_da_semana(wa_id):
@@ -40,8 +40,8 @@ def consultar_objetivo_da_semana(wa_id):
         {"wa_id": wa_id, "tipo": "objetivo_da_semana"},
         sort=[("data", -1)]
     )
-    if memoria:
-        print(f"🎯 Objetivo encontrado para {wa_id}: {memoria['conteudo']}")
-    else:
-        print(f"📭 Nenhum objetivo encontrado para {wa_id}")
+    # if memoria:
+    #     print(f"🎯 Objetivo encontrado para {wa_id}: {memoria['conteudo']}")
+    # else:
+    #     print(f"📭 Nenhum objetivo encontrado para {wa_id}")
     return memoria["conteudo"] if memoria else None

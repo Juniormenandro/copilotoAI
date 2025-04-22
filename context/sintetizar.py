@@ -32,8 +32,8 @@ async def salvar_contexto_usuario(wa_id: str, contexto: Dict):
         {"$set": novo_valor},
         upsert=True
     )
-    print(f"_💾_ Contexto salvo no MongoDB para {wa_id}: {novo_valor}")
-    print('__💾__' * 20)
+    # print(f"_💾_ Contexto salvo no MongoDB para {wa_id}: {novo_valor}")
+    # print('__💾__' * 20)
 
 
 
@@ -48,7 +48,7 @@ def formatar_historico(historico):
         f"{msg['origem'].capitalize()}: {msg['mensagem']}" for msg in historico
     )
 def resumir_mensagens_repetidas(historico):
-    print("_📦_ resumir_mensagens_repetidas")
+   # print("_📦_ resumir_mensagens_repetidas")
     mensagens = [msg['mensagem'] for msg in historico if msg['origem'] == 'usuario']
     contagem = Counter(mensagens)
     comprimido = []
@@ -94,7 +94,7 @@ analista_emocional_agent = Agent(
 
 #=========== logica que chama o agent e passa as informacoes para ele analizar e retorna o resumo ======#
 async def sintetizar_historico_com_agente(historico):
-    print("_📦_ dentro do sintetizar_historico_com_agente analizar e retorna o resumo")
+   # print("_📦_ dentro do sintetizar_historico_com_agente analizar e retorna o resumo")
     mensagens_formatadas = "\n".join(resumir_mensagens_repetidas(historico))
     entrada = f"Histórico recente:\n{mensagens_formatadas}"
     resposta = await Runner.run(
@@ -111,7 +111,7 @@ async def sintetizar_historico_com_agente(historico):
 
 #===== logica principal que regencia as dados e a resposta do agent e retonar como context =========#
 async def carregar_contexto_usuario(wa_id: str, historico) -> dict:
-    print(f"_📦_ dentro do carregar_contexto_usuario a logica de criacao do context")
+   # print(f"_📦_ dentro do carregar_contexto_usuario a logica de criacao do context")
     usuario = users_collection.find_one({"wa_id": wa_id}) or {}
 
     minutos_passados = None
@@ -119,11 +119,11 @@ async def carregar_contexto_usuario(wa_id: str, historico) -> dict:
 
     if historico and "timestamp" in historico[0]:
         resumo_dados = await sintetizar_historico_com_agente(historico)
-        print("\n_📦_ Contexto carregado com Agente 📦")
-        print(f"_📦_ wa_id: {wa_id}")
-        print(f"_📦_ resumo: {resumo_dados['resumo']}")
-       # print(f"- conversa_em_andamento: {resumo_dados['conversa_em_andamento']}")
-        print('-📦-' * 20)
+        # print("\n_📦_ Contexto carregado com Agente 📦")
+        # print(f"_📦_ wa_id: {wa_id}")
+        # print(f"_📦_ resumo: {resumo_dados['resumo']}")
+        # print(f"- conversa_em_andamento: {resumo_dados['conversa_em_andamento']}")
+        # print('-📦-' * 20)
 
         msg_time = historico[0]["timestamp"]
         if msg_time.tzinfo is None:

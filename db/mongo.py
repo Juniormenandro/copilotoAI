@@ -25,7 +25,7 @@ def salvar_mensagem(wa_id: str, origem: str, mensagem: str) -> None:
             "timestamp": int(time.time())
         }
         colecao_mensagens.insert_one(documento)
-        print(f"💾 Mensagem salva: {mensagem}")
+      #  print(f"💾 Mensagem salva: {mensagem}")
     except Exception as e:
         print(f"❌ Erro ao salvar mensagem: {e}")
 
@@ -39,6 +39,6 @@ def salvar_comportamento(wa_id: str, comportamento: dict) -> None:
             "timestamp": int(time.time())
         }
         colecao_comportamento.insert_one(documento)
-        print(f"💾 Comportamento salvo: {comportamento}")
+       # print(f"💾 Comportamento salvo: {comportamento}")
     except Exception as e:
         print(f"❌ Erro ao salvar comportamento: {e}")

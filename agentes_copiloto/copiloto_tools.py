@@ -24,7 +24,7 @@ def parse_data_inteligente(texto: str):
 # ======================== ✅  ========================
 def to_function_tool(fn, name: str, description: str, params_schema: dict):
     async def on_invoke_tool(context, tool_input):
-        print(f"_🛠️ _ Tool recebida: {tool_input}")
+     #  print(f"_🛠️ _ Tool recebida: {tool_input}")
         # print(f"_🚨_ tool_input final: {tool_input}")
         # print(f"_🚨_ context.context: {getattr(context, 'context', {})}")
 
@@ -46,7 +46,7 @@ def to_function_tool(fn, name: str, description: str, params_schema: dict):
         # ⚠️ Se ainda não achou, previne salvamento errado
         if wa_id_from_context:
             tool_input["wa_id"] = wa_id_from_context
-            print(f"_🧠 _ wa_id forçado: {tool_input['wa_id']}")
+          #  print(f"_🧠 _ wa_id forçado: {tool_input['wa_id']}")
         else:
             print("🚨 ERRO: wa_id ausente no contexto! Tool pode falhar ao salvar.")
 
@@ -68,7 +68,7 @@ def to_function_tool(fn, name: str, description: str, params_schema: dict):
 
 # ============== ✅ REGISTRAR TAREFA ==========================
 async def registrar_tarefa_tool(wa_id: int, descricao: str = None, data_entrega: str = None, context: dict = {}) -> dict:
-    print(f"_🛠️ _ Registrando tarefa para: {wa_id}")
+  #  print(f"_🛠️ _ Registrando tarefa para: {wa_id}")
     # print(interpretar_data_relativa("amanhã às 15h"))
     # print(interpretar_data_relativa("sexta-feira"))
     # print(interpretar_data_relativa("25 de abril"))
@@ -77,12 +77,12 @@ async def registrar_tarefa_tool(wa_id: int, descricao: str = None, data_entrega:
     context_dict = context.context if hasattr(context, "context") else context
     if descricao and data_entrega:
         data_formatada, observacao_extra = parse_data_inteligente(data_entrega)
-        print(f"_🛠️ _ 📦 Tarefa recebida: {descricao} | Data interpretada: {data_formatada}")
+      #  print(f"_🛠️ _ 📦 Tarefa recebida: {descricao} | Data interpretada: {data_formatada}")
         if not data_formatada:
             return {
                 "message": f"Parece que houve um problema para registrar a data como \"{data_entrega}\". Que tal apenas 'amanhã'? Posso registrar assim."
             }
-        print(f"_🛠️ __💾_ Registrando tarefa no banco: {descricao} para {data_formatada}")
+      #  print(f"_🛠️ __💾_ Registrando tarefa no banco: {descricao} para {data_formatada}")
         from db.tarefas import registrar_tarefa
         registrar_tarefa(wa_id, descricao, data_entrega=data_formatada)
         context_dict.pop("tarefa_em_construcao", None)
@@ -139,7 +139,7 @@ registrar_tarefa_tool_func = to_function_tool(
 
 # 📋 ============= LISTAR TAREFAS ========================
 async def listar_tarefas_tool(wa_id: int) -> dict:
-    print(f"_💾_ 📋 Listando tarefas para {wa_id}")
+   # print(f"_💾_ 📋 Listando tarefas para {wa_id}")
     tarefas = listar_tarefas(wa_id)
     if not tarefas:
         return {"message": "🎉 Você não tem tarefas pendentes no momento!"}
@@ -236,7 +236,7 @@ adiar_tarefa_tool_func = to_function_tool(
 # ======================== 🎯 SALVAR OBJETIVO ========================
 async def salvar_objetivo_tool(wa_id: int, objetivo: str) -> dict:
     salvar_memoria(wa_id, "objetivo_da_semana", objetivo)
-    print(f"_🛠️ __💾_ Salvando memória para: {wa_id}")
+   # print(f"_🛠️ __💾_ Salvando memória para: {wa_id}")
     return {"message": "🎯 Objetivo da semana salvo com sucesso!"}
 #==========salvar_objetivo  chamada pelo agent ==================
 salvar_objetivo_tool_func = to_function_tool(
@@ -257,7 +257,7 @@ salvar_objetivo_tool_func = to_function_tool(
 
 # ======================== 🔍 CONSULTAR OBJETIVO ========================
 async def consultar_objetivo_tool(wa_id: int) -> dict:
-    print(f"_🛠️ _ Consultando memória para: {wa_id}")
+   # print(f"_🛠️ _ Consultando memória para: {wa_id}")
     objetivo = consultar_objetivo_da_semana(wa_id)
     if objetivo:
         return {"message": f"🎯 Seu objetivo da semana é: {objetivo}"}
@@ -291,8 +291,8 @@ consultar_objetivo_tool_func = to_function_tool(
 # =================== tools para o agente de emocional para teste de acesso ao context. 
 async def ver_contexto_tool(confirmacao: str, context=None):
     try:
-        print("_🛠️ _ Entrou na função ver_contexto_tool")
-        print("_🛠️ __📦_ Context recebido:", context)
+       # print("_🛠️ _ Entrou na função ver_contexto_tool")
+      #  print("_🛠️ __📦_ Context recebido:", context)
         if confirmacao.lower() != "sim":
             return "Beleza! Não vou mostrar o contexto agora. 😉"
         contexto_dict = getattr(context, "context", None)
@@ -328,7 +328,7 @@ async def ver_contexto_tool(confirmacao: str, context=None):
 #========= Função base que altera o contexto ===========================
 async def _setar_em_andamento(wa_id=None, context=None):
     context_dict = context.context if hasattr(context, "context") else context
-    print(f"_🛠️ _ dentro da tools de conversa em andamento (wa_id: {wa_id})")
+   # print(f"_🛠️ _ dentro da tools de conversa em andamento (wa_id: {wa_id})")
 
     if wa_id is None:
         wa_id = context_dict.get("wa_id")
@@ -346,7 +346,7 @@ async def _setar_em_andamento(wa_id=None, context=None):
         contexto_limpo["conversa_em_andamento"] = True
         contexto_limpo["ultima_interacao"] = datetime.now(timezone.utc)
 
-        print("_🛠️ __💾_ Salvar context. aqui pelo tools _setar_em_andamento", contexto_limpo.get("conversa_em_andamento"))
+       # print("_🛠️ __💾_ Salvar context. aqui pelo tools _setar_em_andamento", contexto_limpo.get("conversa_em_andamento"))
         await salvar_contexto_usuario(wa_id, contexto_limpo)
         return {"message": "Conversa marcada como em andamento com sucesso."}
     else:
@@ -377,10 +377,10 @@ marcar_conversa_em_andamento_tool = to_function_tool(
 def criar_tool_setar_agente(nome_agente):
     async def setar_agente_em_conversa(wa_id: str, context):
         context_dict = context.context if hasattr(context, "context") else context
-        print(f"_🛠️ _ dentro da tools setar_agente_em_conversa (wa_id: {wa_id})")
+       # print(f"_🛠️ _ dentro da tools setar_agente_em_conversa (wa_id: {wa_id})")
         context_dict["agente_em_conversa"] = nome_agente
         context_dict["conversa_em_andamento"] = True
-        print("_🛠️ __💾_ Salvar context. aqui pelo tools setar_agente_em_conversa", context_dict.get("agente_em_conversa"))
+       # print("_🛠️ __💾_ Salvar context. aqui pelo tools setar_agente_em_conversa", context_dict.get("agente_em_conversa"))
         await salvar_contexto_usuario(wa_id, context_dict)
         return {"message": f"Agente definido como {nome_agente}."}
     return to_function_tool(

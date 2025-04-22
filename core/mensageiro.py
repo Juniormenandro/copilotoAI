@@ -27,7 +27,7 @@ def enviar_resposta(numero, mensagem):
     response = requests.post(url, headers=headers, json=payload)
     #print("🔁 Resposta completa:", response.status_code, response.text)
 
-    if response.status_code == 200:
-        print(f"✅ Mensagem enviada para {numero}")
-    else:
-        print(f"❌ Erro ao enviar: {response.status_code} - {response.text}")
+    # if response.status_code == 200:
+    #     print(f"✅ Mensagem enviada para {numero}")
+    # else:
+    #     print(f"❌ Erro ao enviar: {response.status_code} - {response.text}")

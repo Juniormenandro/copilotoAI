@@ -1,9 +1,11 @@
 # ============ DEPENDÊNCIAS PRINCIPAIS ============
 
 # SDK OpenAI para agentes e transcrição Whisper
-openai>=1.10.0
+openai>=1.14.0
+openai-agents>=0.0.12
+
 # Caso use agents SDK oficial da OpenAI:
-openai-agents>=0.1.0
+# openai-agents>=0.1.0
 
 # Flask API
 Flask>=2.2.5
@@ -13,6 +15,7 @@ gunicorn>=21.2.0  # Necessário para deploy no Railway
 # MongoDB
 pymongo>=4.6.1
 python-dotenv>=1.0.1
+apscheduler>=3.10.4
 
 # Manipulação de áudio
 ffmpeg-python>=0.2.0
@@ -31,6 +34,9 @@ pyngrok>=5.3.0
 # Painel de análise
 streamlit>=1.32.2
 wordcloud>=1.8.2.2
+
+
+
 
 # ============ DEPENDÊNCIAS OPCIONAIS ============
 # googletrans==4.0.0-rc1  # Alternativa ao deep-translator

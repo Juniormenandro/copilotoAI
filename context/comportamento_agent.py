@@ -70,6 +70,6 @@ async def executor_comportamento(mensagem: str, contexto: CopilotoContext):
     dados_dict = dados.model_dump()
     dados_dict["timestamp"] = datetime.utcnow()
 
-    print("🧠 Resultado do agente de comportamento:", dados_dict)
+  #  print("🧠 Resultado do agente de comportamento:", dados_dict)
     salvar_comportamento(contexto.wa_id, dados_dict)
     return dados
