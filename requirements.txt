@@ -46,7 +46,7 @@ wordcloud>=1.8.2.2
 
 # -----------------------------
 # COMO INSTALAR DEPENDÊNCIAS
-# Para Windows/macOS/Linux:
+
 # Crie um ambiente virtual e ative:
 # python3 -m venv venv
 # source venv/bin/activate  (Linux/Mac)
@@ -55,6 +55,8 @@ wordcloud>=1.8.2.2
 # Instale as dependências:
 # pip install --upgrade pip
 # pip install -r requirements.txt
+# gunicorn app:app
+
 
 # brew tap mongodb/brew
 # brew install mongodb-community
