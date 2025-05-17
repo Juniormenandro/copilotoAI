@@ -9,6 +9,7 @@ openai-agents>=0.0.12
 
 # Flask API
 Flask>=2.2.5
+flask-cors
 requests>=2.31.0
 gunicorn>=21.2.0  # Necessário para deploy no Railway
 
