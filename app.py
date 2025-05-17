@@ -1,5 +1,5 @@
 # app.py 
-from flask import Flask, request, Response, render_template # type: ignore
+from flask import Flask, request, Response, render_template, jsonify # type: ignore
 from dotenv import load_dotenv # type: ignore
 from pymongo import MongoClient # type: ignore
 from db.users import salvar_ou_atualizar_usuario
@@ -10,14 +10,21 @@ from utils.transcrever_audio import transcrever_audio_do_whatsapp
 from context.sintetizar import salvar_contexto_usuario
 from context.verificar_conversa import verificar_necessidade_resumo
 from agentes_copiloto.triagem import triage_copiloto_agent
+from Agent_serviflex.Agent_principal import Agent_principal
 from agents import Runner # type: ignore
 import tempfile
 import requests # type: ignore
 import asyncio
 import os
+from flask_cors import CORS # type: ignore
+from openai import OpenAI # type: ignore
+
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
+client = OpenAI()
+
 
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
@@ -32,6 +39,93 @@ users_collection = db["users"]
 def index():
     return render_template('index.html')
 
+
+
+
+
+
+
+
+
+
+# Simula memória de curto prazo com histórico simples por sessão
+def formatar_historico_para_prompt(history):
+    mensagens_formatadas = []
+    for msg in history:
+        role = msg.get("role", "")
+        content = msg.get("content", "")
+        if role == "user":
+            mensagens_formatadas.append(f"Usuário: {content}")
+        elif role == "assistant":
+            mensagens_formatadas.append(f"Assistente: {content}")
+    return "\n".join(mensagens_formatadas)
+
+
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    message = data.get('message')
+    history = data.get('history', [])
+
+    if not message:
+        return jsonify({'error': 'Mensagem vazia'}), 400
+
+
+    formatted_history = formatar_historico_para_prompt(history)
+    entrada_formatada = f"{formatted_history}\nUsuário: {message}"
+
+    try:
+        result = asyncio.run(Runner.run(
+            Agent_principal,
+            input=entrada_formatada,
+        ))
+
+        reply = getattr(result, "final_output", str(result))
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route("/webhook", methods=["GET"])
 def verify():
     mode = request.args.get("hub.mode")
@@ -44,7 +138,6 @@ def verify():
     else:
         print("❌ Erro na verificação do Webhook")
         return "Erro de verificação", 403
-
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
