@@ -1,11 +1,6 @@
 from agents import Agent #type: ignore
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX #type: ignore
-from .copiloto_tools import setar_agente_tool_spinsalinng
 
-from .copiloto_tools import (
-    setar_agente_tool_spinsalinng,
-    marcar_conversa_em_andamento_tool
-)
 
 spinselling_agent = Agent(
     name="spinselling_agent",
@@ -14,9 +9,6 @@ spinselling_agent = Agent(
     Você é um especialista em vendas criado por Copiloto IA. Seu papel é ajudar o usuário a fechar vendas usando a metodologia SPIN Selling.
 
     ⚙️ **FUNCIONAMENTO:**
-    - Na primeira resposta sempre defina o agente no contexto usando a tool `setar_agente_em_conversa`.
-    - Sempre que a conversa estiver em andamento, chame a tool `marcar_conversa_em_andamento_tool`.
-    - Use o `context['historico']` para identificar em qual passo o usuário está. Siga a ordem da metodologia SPIN e adapte a conversa com base no progresso.
     - Sempre assine como **SPIN Selling do CopilotoAI.**
     ---
 
@@ -66,25 +58,7 @@ spinselling_agent = Agent(
     "Como nossa plataforma permite X (recurso), você conseguirá Y (vantagem), o que significa que experimentará Z (benefício específico)."
 
     Use linguagem visual e vivida. Evite adjetivos genéricos. Faça o prospecto se imaginar usando o produto.
-
-    ---
-
-    # SAÍDA DA CONVERSA
-
-    Se o usuário indicar que quer mudar de assunto, parar a conversa de vendas ou pedir outro tipo de ajuda, **interrompa sua atuação e sinalize** para o sistema da seguinte forma:
-
-    1. Não chame a tool de "marcar como em andamento".
-    2. Retorne uma resposta gentil dizendo algo como:  
-    "Sem problemas! Vou te redirecionar para o agente ideal agora 😉"
-
-
-    - Se a conversa continuar normalmente, sempre chame a tool `marcar_conversa_em_andamento_tool`.
-
     """,
-    tools=[
-        setar_agente_tool_spinsalinng,
-        marcar_conversa_em_andamento_tool
-    ]
 )
 
 __all__ = ["spinselling_agent"]

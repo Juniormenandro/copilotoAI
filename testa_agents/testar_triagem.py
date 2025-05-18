@@ -5,14 +5,8 @@ import asyncio
 from agents import Runner #type: ignore
 from pymongo import MongoClient #type: ignore
 from dotenv import load_dotenv #type: ignore
-from agentes_copiloto.triagem import triage_copiloto_agent
-from context.sintetizar import salvar_contexto_usuario
-from agentes_copiloto.triagem import triage_copiloto_agent
-from context.verificar_conversa import verificar_necessidade_resumo
-from agentes_copiloto.spinsalinng import spinselling_agent
-from agentes_copiloto.solucoes_ai import solucoes_ai_em_demanda_agent
-from core.mensageiro import enviar_resposta
-from db.historico import salvar_mensagem
+from Agent_copiloto.triagem import triage_copiloto_agent
+
 
 load_dotenv() 
 client = MongoClient(os.getenv("MONGO_URI"))
@@ -63,25 +57,10 @@ async def testar_triagem():
         print("✅================ TESTE: TRIAGEM INTELIGENTE =================✅")
         print(f"_❓_ Cenário {i}: {mensagem}")
         wa_id = "353833844418"
-        resposta_contexto = await verificar_necessidade_resumo(wa_id, mensagem)
-        contexto = resposta_contexto
         # print(contexto)
-        if isinstance(resposta_contexto, str):
-            resposta_texto = resposta_contexto.strip()
-            print(f"_❓__❓_⚡ Resposta direta do agente ativo: {resposta_texto}")
-            estado_mongo = users_collection.find_one(
-                {"wa_id": wa_id},
-                {"_id": 0, "agente_em_conversa": 1, "ultima_interacao": 1, "conversa_em_andamento":1}
-            )
-            print(f"_💾_ Contexto Mongo: agente_em_conversa = {estado_mongo.get('agente_em_conversa')}")    
-            print(f"_💾_ Contexto Mongo: conversa_em_andamento = {estado_mongo.get('conversa_em_andamento')}")     
-            print("================ AGENTE DIRETO — FIM =================")
-            return 
-
-
-        resposta = await Runner.run(triage_copiloto_agent, input=mensagem, context=contexto)
+       
+        resposta = await Runner.run(triage_copiloto_agent, input=mensagem)
         resposta_agent = resposta.final_output.strip()
-        # await salvar_contexto_usuario(wa_id, contexto)
         # print("__✅__" * 10)
         print(f"💬 Resposta final: {resposta_agent}\n")
 
