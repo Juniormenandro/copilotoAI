@@ -118,7 +118,7 @@ def webhook():
                     print("❌ Erro ao processar a retorno no agent:") 
             except Exception as e:
                 print("❌ Erro ao processar a mensagem:", e)
-        
+            return Response(status=200)
         elif mensagem["type"] == "audio":
             try:
                 audio_id = mensagem["audio"]["id"]
@@ -158,7 +158,7 @@ def webhook():
             except Exception as e:
                 print("❌ Erro ao processar áudio:", e)
                 user_message = "Não consegui entender o áudio. Pode tentar digitar?"
-        
+            return Response(status=200)
         else:
             print("⚠️ Tipo de mensagem não suportado:", mensagem["type"])
             return Response(status=200)
